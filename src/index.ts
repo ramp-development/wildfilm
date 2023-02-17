@@ -7,20 +7,20 @@ window.Webflow.push(() => {
   pages.all();
 
   switch (pathname) {
-    case '/blog':
-      pages.blog();
-      break;
-    case '/careers':
-      pages.careersList();
-      break;
-    case '/culture':
-      pages.culture();
-      break;
     case '/':
       pages.home();
       break;
     case '/work':
       pages.workList();
+      break;
+    case '/culture':
+      pages.culture();
+      break;
+    case '/blog':
+      pages.blog();
+      break;
+    case '/careers':
+      pages.careersList();
       break;
     case pathname.includes('/work/'):
       pages.workTemplate();

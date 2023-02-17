@@ -1,8 +1,14 @@
+import { getCurrentBreakpoint } from '@finsweet/ts-utils';
+
 import { scrollAnimation } from '../utils/scrollAnimation';
 
 export const home = () => {
   heroScroll();
-  featuredWork();
+
+  const breakpoint = getCurrentBreakpoint();
+  if (breakpoint === 'main') featuredWork();
+
+  services();
 
   function heroScroll() {
     const track: HTMLElement = document.querySelector('.home-hero_track');
@@ -27,36 +33,47 @@ export const home = () => {
   }
 
   function featuredWork() {
-    const workMetaWrapper = document.querySelector('.featured-meta_wrapper');
-    if (!workMetaWrapper) return;
-    const workMetaLinks = [...workMetaWrapper.querySelectorAll('.featured-meta_link')];
-    const workItems = [...document.querySelectorAll('.featured-work_item')];
-
-    const padding = workMetaLinks[0].offsetLeft;
-
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const featuredWorkRows = [...document.querySelectorAll('.featured-work_row')];
+    featuredWorkRows.forEach((featuredWorkRow) => {
+      const featuredWorkMetaList = featuredWorkRow.querySelector('.featured-meta_list');
+      if (!featuredWorkMetaList) return;
 
-    workItems.forEach((item, index) => {
-      const workMetaItem = workMetaLinks[index];
+      const featuredWorkMetaLinks = [
+        ...featuredWorkMetaList.querySelectorAll('.featured-meta_link'),
+      ];
+      const featuredWorkItems = [...featuredWorkRow.querySelectorAll('.featured-work_item')];
 
-      item.addEventListener('mouseover', () => {
-        const offset = workMetaItem.offsetLeft;
+      featuredWorkItems.forEach((featuredWorkItem, index) => {
+        const featuredWorkMetaItem = featuredWorkMetaLinks[index];
 
-        workMetaLinks.forEach((link) => {
-          link.style.opacity = link === workMetaItem ? '1' : '0.1';
-        });
+        featuredWorkItem.addEventListener('mouseover', () => {
+          const offset = featuredWorkMetaItem.offsetTop;
 
-        workMetaWrapper.scrollTo({
-          left: offset - padding,
-          behavior: prefersReducedMotion ? 'auto' : 'smooth',
+          featuredWorkMetaList.scrollTo({
+            top: offset,
+            behavior: prefersReducedMotion ? 'auto' : 'smooth',
+          });
         });
       });
+    });
+  }
 
-      item.addEventListener('mouseout', () => {
-        workMetaLinks.forEach((link) => {
-          link.style.opacity = '1';
-        });
-      });
+  function services() {
+    const servicesList = document.querySelector('.services_list');
+    if (!servicesList) return;
+
+    let currentOffset = 0;
+    let rows = 1;
+    const serviceItems = [...servicesList?.querySelectorAll('.services_item')];
+    serviceItems.forEach((item) => {
+      // align the items
+      const itemOffsetTop = item.offsetTop;
+      if (itemOffsetTop > currentOffset) {
+        if (rows % 2) item.style.marginLeft = 'auto';
+        currentOffset = itemOffsetTop;
+        rows += 1;
+      }
     });
   }
 };

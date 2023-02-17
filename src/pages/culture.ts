@@ -1,4 +1,3 @@
-import { getDistanceFromTop } from '../utils/getDistanceFromTop';
 import { scrollAnimation } from '../utils/scrollAnimation';
 
 export const culture = () => {
@@ -7,25 +6,21 @@ export const culture = () => {
   processScroll();
 
   function heroScroll() {
+    const component: HTMLElement = document.querySelector('.sticky_component');
     const hero: HTMLElement = document.querySelector('.hero');
     const track: HTMLElement = hero.querySelector('.horizontal_track');
-    const sticky: HTMLElement = track.querySelector('.horizontal_sticky');
-    const move: HTMLElement = sticky.querySelector('.horizontal_list');
-
-    const stickyTop = `${getDistanceFromTop(track)}px`;
-    sticky.style.top = stickyTop;
-    const stickyBottom = `${getDistanceFromTop(track) + sticky.offsetHeight}px`;
-
+    const move: HTMLElement = track.querySelector('.horizontal_list');
+    const heroHeight = hero.offsetHeight;
     const moveWidth = move.offsetWidth;
     const windowWidth = window.innerWidth;
-    track.style.height = `${moveWidth - windowWidth}px`;
+    component.style.height = `${heroHeight + (moveWidth - windowWidth)}px`;
 
     scrollAnimation({
       timeline: {
-        trigger: track,
+        trigger: component,
         target: move,
-        start: `top ${stickyTop}`,
-        end: `bottom ${stickyBottom}`,
+        start: `top top`,
+        end: `bottom bottom`,
       },
       options: {
         x: function () {
@@ -56,9 +51,9 @@ export const culture = () => {
 
   function processScroll() {
     const wrapper: HTMLElement = document.querySelector('.process_wrapper');
-    const track: HTMLElement = wrapper.querySelector('.horizontal_track');
-    const sticky: HTMLElement = track.querySelector('.horizontal_sticky');
-    const move: HTMLElement = sticky.querySelector('.horizontal_list');
+    const sticky: HTMLElement = wrapper.querySelector('.process_sticky');
+    const track: HTMLElement = sticky.querySelector('.process_track');
+    const move: HTMLElement = track.querySelector('.horizontal_list');
 
     const windowHeight = window.innerHeight;
     const listHeight = move.offsetHeight;
@@ -70,11 +65,11 @@ export const culture = () => {
 
     const moveWidth = move.offsetWidth;
     const windowWidth = window.innerWidth;
-    track.style.height = `${moveWidth - windowWidth}px`;
+    wrapper.style.height = `${moveWidth - windowWidth}px`;
 
     scrollAnimation({
       timeline: {
-        trigger: track,
+        trigger: wrapper,
         target: move,
         start: `top ${stickyTop}`,
         end: `bottom ${stickyBottom}`,

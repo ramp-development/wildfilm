@@ -1,6 +1,6 @@
-import { getCurrentBreakpoint } from '@finsweet/ts-utils';
+import { getCurrentBreakpoint, simulateEvent } from '@finsweet/ts-utils';
 
-import { controlAllVideos } from '$utils/controlAllVideos';
+import { controlVideo } from '$utils/controlVideo';
 
 export const all = () => {
   registerGSAP();
@@ -16,6 +16,15 @@ export const all = () => {
 
   function initNav() {
     const navComponent = document.querySelector('.nav_component');
+
+    const contactTrigger = navComponent.querySelector('[data-contact="trigger"]');
+    const contactButtons = [...navComponent.querySelectorAll('[data-contact="button"]')];
+    contactButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        simulateEvent(contactTrigger, 'click');
+      });
+    });
+
     const navForm = navComponent.querySelector('form');
     const navFormButton = navForm.querySelector('.button');
     navFormButton.addEventListener('click', () => {
@@ -24,18 +33,18 @@ export const all = () => {
   }
 
   function videos() {
-    const videoWrappers = [...document.querySelectorAll('.video_embed')];
+    const videoWrappers = [...document.querySelectorAll('.video_embed, .services_item')];
     if (getCurrentBreakpoint() === 'main') {
       videoWrappers.forEach((videoWrapper) => {
-        const video = videoWrapper.querySelector('video');
+        const video: HTMLVideoElement = videoWrapper.querySelector('video');
+        controlVideo(video, 'pause');
 
         videoWrapper.addEventListener('mouseover', () => {
-          controlAllVideos('pause');
-          video.play();
+          controlVideo(video, 'play');
         });
 
         videoWrapper.addEventListener('mouseout', () => {
-          controlAllVideos('play');
+          controlVideo(video, 'pause');
         });
       });
     }
