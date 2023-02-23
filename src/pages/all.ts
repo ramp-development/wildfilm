@@ -5,7 +5,20 @@ import { controlVideo } from '$utils/controlVideo';
 export const all = () => {
   registerGSAP();
   initNav();
-  videos();
+
+  // run breakpoint specific code
+  const breakpoint = getCurrentBreakpoint();
+  switch (breakpoint) {
+    case 'main':
+      videos();
+      break;
+    case 'medium':
+      break;
+    case 'small':
+      break;
+    case 'tiny':
+      break;
+  }
 
   function registerGSAP() {
     gsap.registerPlugin(ScrollTrigger);
@@ -15,18 +28,28 @@ export const all = () => {
   }
 
   function initNav() {
-    const navComponent = document.querySelector('.nav_component');
+    const navComponent: HTMLElement | null = document.querySelector('.nav_component');
+    if (!navComponent) return;
 
-    const contactTrigger = navComponent.querySelector('[data-contact="trigger"]');
-    const contactButtons = [...navComponent.querySelectorAll('[data-contact="button"]')];
-    contactButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        simulateEvent(contactTrigger, 'click');
+    const contactTrigger: HTMLElement | null = navComponent.querySelector(
+      '[data-contact="trigger"]'
+    );
+    const contactButtons: HTMLElement[] | null = [
+      ...navComponent.querySelectorAll('[data-contact="button"]'),
+    ];
+
+    if (contactTrigger && contactButtons && contactButtons.length > 0) {
+      contactButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          simulateEvent(contactTrigger, 'click');
+        });
       });
-    });
+    }
 
-    const navForm = navComponent.querySelector('form');
-    const navFormButton = navForm.querySelector('.button');
+    const navForm: HTMLFormElement | null = navComponent.querySelector('form');
+    if (!navForm) return;
+    const navFormButton: HTMLElement | null = navForm.querySelector('.button');
+    if (!navFormButton) return;
     navFormButton.addEventListener('click', () => {
       navForm.requestSubmit();
     });
@@ -34,19 +57,17 @@ export const all = () => {
 
   function videos() {
     const videoWrappers = [...document.querySelectorAll('.video_embed, .services_item')];
-    if (getCurrentBreakpoint() === 'main') {
-      videoWrappers.forEach((videoWrapper) => {
-        const video: HTMLVideoElement = videoWrapper.querySelector('video');
-        controlVideo(video, 'pause');
+    videoWrappers.forEach((videoWrapper) => {
+      const video: HTMLVideoElement = videoWrapper.querySelector('video');
+      controlVideo(video, 'pause');
 
-        videoWrapper.addEventListener('mouseover', () => {
-          controlVideo(video, 'play');
-        });
-
-        videoWrapper.addEventListener('mouseout', () => {
-          controlVideo(video, 'pause');
-        });
+      videoWrapper.addEventListener('mouseover', () => {
+        controlVideo(video, 'play');
       });
-    }
+
+      videoWrapper.addEventListener('mouseout', () => {
+        controlVideo(video, 'pause');
+      });
+    });
   }
 };

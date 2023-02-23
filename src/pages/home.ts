@@ -5,10 +5,21 @@ import { scrollAnimation } from '../utils/scrollAnimation';
 export const home = () => {
   heroScroll();
 
+  // run breakpoint specific code
   const breakpoint = getCurrentBreakpoint();
-  if (breakpoint === 'main') featuredWork();
-
-  services();
+  switch (breakpoint) {
+    case 'main':
+      featuredWork();
+      services();
+      break;
+    case 'medium':
+      services();
+      break;
+    case 'small':
+      break;
+    case 'tiny':
+      break;
+  }
 
   function heroScroll() {
     const track: HTMLElement = document.querySelector('.home-hero_track');
@@ -35,6 +46,7 @@ export const home = () => {
   function featuredWork() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const featuredWorkRows = [...document.querySelectorAll('.featured-work_row')];
+
     featuredWorkRows.forEach((featuredWorkRow) => {
       const featuredWorkMetaList = featuredWorkRow.querySelector('.featured-meta_list');
       if (!featuredWorkMetaList) return;
@@ -42,10 +54,14 @@ export const home = () => {
       const featuredWorkMetaLinks = [
         ...featuredWorkMetaList.querySelectorAll('.featured-meta_link'),
       ];
-      const featuredWorkItems = [...featuredWorkRow.querySelectorAll('.featured-work_item')];
 
-      featuredWorkItems.forEach((featuredWorkItem, index) => {
-        const featuredWorkMetaItem = featuredWorkMetaLinks[index];
+      const featuredWorkItems = [...featuredWorkRow.querySelectorAll('.featured-work_item')];
+      featuredWorkItems.forEach((featuredWorkItem) => {
+        const featuredWorkLink = featuredWorkItem.querySelector('a');
+        const destination = featuredWorkLink.href;
+        const featuredWorkMetaItem = featuredWorkMetaLinks.find((link) => {
+          return link.href === destination;
+        });
 
         featuredWorkItem.addEventListener('mouseover', () => {
           const offset = featuredWorkMetaItem.offsetTop;

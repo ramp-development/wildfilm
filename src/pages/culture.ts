@@ -1,3 +1,5 @@
+import { imagesLoaded } from '$utils/imagesLoaded';
+
 import { scrollAnimation } from '../utils/scrollAnimation';
 
 export const culture = () => {
@@ -6,28 +8,43 @@ export const culture = () => {
   processScroll();
 
   function heroScroll() {
-    const component: HTMLElement = document.querySelector('.sticky_component');
-    const hero: HTMLElement = document.querySelector('.hero');
-    const track: HTMLElement = hero.querySelector('.horizontal_track');
-    const move: HTMLElement = track.querySelector('.horizontal_list');
-    const heroHeight = hero.offsetHeight;
-    const moveWidth = move.offsetWidth;
-    const windowWidth = window.innerWidth;
-    component.style.height = `${heroHeight + (moveWidth - windowWidth)}px`;
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
 
-    scrollAnimation({
-      timeline: {
-        trigger: component,
-        target: move,
-        start: `top top`,
-        end: `bottom bottom`,
-      },
-      options: {
-        x: function () {
-          return (moveWidth - windowWidth) * -1;
+    const images = [...hero.querySelectorAll('img')];
+    if (images.length === 0) return;
+
+    imagesLoaded(images, init);
+    function init() {
+      const component: HTMLElement | null = document.querySelector('.sticky_component');
+      if (!component) return;
+
+      const hero: HTMLElement | null = component.querySelector('.hero');
+      if (!hero) return;
+
+      const track: HTMLElement | null = hero.querySelector('.horizontal_track');
+      if (!track) return;
+
+      const move: HTMLElement | null = track.querySelector('.horizontal_list');
+      if (!move) return;
+
+      const heroHeight = hero.offsetHeight;
+      const moveWidth = move.offsetWidth;
+      const windowWidth = window.innerWidth;
+      component.style.height = `${heroHeight + (moveWidth - windowWidth)}px`;
+
+      scrollAnimation({
+        timeline: {
+          trigger: component,
+          target: move,
+          start: `top top`,
+          end: `bottom bottom`,
         },
-      },
-    });
+        options: {
+          x: (): number => (moveWidth - windowWidth) * -1,
+        },
+      });
+    }
   }
 
   function storyTextHighlight() {
@@ -42,7 +59,7 @@ export const culture = () => {
           });
         },
         {
-          rootMargin: '0px 0px -45% 0px',
+          rootMargin: '0px 0px -20% 0px',
           threshold: 0.5,
         }
       ).observe(trigger);
@@ -50,35 +67,48 @@ export const culture = () => {
   }
 
   function processScroll() {
-    const wrapper: HTMLElement = document.querySelector('.process_wrapper');
-    const sticky: HTMLElement = wrapper.querySelector('.process_sticky');
-    const track: HTMLElement = sticky.querySelector('.process_track');
-    const move: HTMLElement = track.querySelector('.horizontal_list');
+    const target = document.querySelector('.section_how');
+    if (!target) return;
 
-    const windowHeight = window.innerHeight;
-    const listHeight = move.offsetHeight;
+    const observer = new IntersectionObserver(init);
+    observer.observe(target);
 
-    const stickyTop = `${windowHeight / 2 - listHeight / 2}px`;
-    const stickyBottom = `${windowHeight / 2 + listHeight / 2}px`;
+    function init() {
+      const wrapper: HTMLElement | null = document.querySelector('.process_wrapper');
+      if (!wrapper) return;
 
-    sticky.style.top = stickyTop;
+      const sticky: HTMLElement | null = wrapper.querySelector('.process_sticky');
+      if (!sticky) return;
 
-    const moveWidth = move.offsetWidth;
-    const windowWidth = window.innerWidth;
-    wrapper.style.height = `${moveWidth - windowWidth}px`;
+      const track: HTMLElement | null = sticky.querySelector('.process_track');
+      if (!track) return;
 
-    scrollAnimation({
-      timeline: {
-        trigger: wrapper,
-        target: move,
-        start: `top ${stickyTop}`,
-        end: `bottom ${stickyBottom}`,
-      },
-      options: {
-        x: function () {
-          return (moveWidth - windowWidth) * -1;
+      const move: HTMLElement | null = track.querySelector('.horizontal_list');
+      if (!move) return;
+
+      const windowHeight = window.innerHeight;
+      const listHeight = move.offsetHeight;
+
+      const stickyTop = `${windowHeight / 2 - listHeight / 2}px`;
+      const stickyBottom = `${windowHeight / 2 + listHeight / 2}px`;
+
+      sticky.style.top = stickyTop;
+
+      const moveWidth = move.offsetWidth;
+      const windowWidth = window.innerWidth;
+      wrapper.style.height = `${moveWidth - windowWidth}px`;
+
+      scrollAnimation({
+        timeline: {
+          trigger: wrapper,
+          target: move,
+          start: `top ${stickyTop}`,
+          end: `bottom ${stickyBottom}`,
         },
-      },
-    });
+        options: {
+          x: (): number => (moveWidth - windowWidth) * -1,
+        },
+      });
+    }
   }
 };

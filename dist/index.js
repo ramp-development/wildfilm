@@ -45,7 +45,18 @@
   var all = () => {
     registerGSAP();
     initNav();
-    videos();
+    const breakpoint = getCurrentBreakpoint();
+    switch (breakpoint) {
+      case "main":
+        videos();
+        break;
+      case "medium":
+        break;
+      case "small":
+        break;
+      case "tiny":
+        break;
+    }
     function registerGSAP() {
       gsap.registerPlugin(ScrollTrigger);
       ScrollTrigger.defaults({
@@ -54,33 +65,43 @@
     }
     function initNav() {
       const navComponent = document.querySelector(".nav_component");
-      const contactTrigger = navComponent.querySelector('[data-contact="trigger"]');
-      const contactButtons = [...navComponent.querySelectorAll('[data-contact="button"]')];
-      contactButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          simulateEvent(contactTrigger, "click");
+      if (!navComponent)
+        return;
+      const contactTrigger = navComponent.querySelector(
+        '[data-contact="trigger"]'
+      );
+      const contactButtons = [
+        ...navComponent.querySelectorAll('[data-contact="button"]')
+      ];
+      if (contactTrigger && contactButtons && contactButtons.length > 0) {
+        contactButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            simulateEvent(contactTrigger, "click");
+          });
         });
-      });
+      }
       const navForm = navComponent.querySelector("form");
+      if (!navForm)
+        return;
       const navFormButton = navForm.querySelector(".button");
+      if (!navFormButton)
+        return;
       navFormButton.addEventListener("click", () => {
         navForm.requestSubmit();
       });
     }
     function videos() {
       const videoWrappers = [...document.querySelectorAll(".video_embed, .services_item")];
-      if (getCurrentBreakpoint() === "main") {
-        videoWrappers.forEach((videoWrapper) => {
-          const video = videoWrapper.querySelector("video");
-          controlVideo(video, "pause");
-          videoWrapper.addEventListener("mouseover", () => {
-            controlVideo(video, "play");
-          });
-          videoWrapper.addEventListener("mouseout", () => {
-            controlVideo(video, "pause");
-          });
+      videoWrappers.forEach((videoWrapper) => {
+        const video = videoWrapper.querySelector("video");
+        controlVideo(video, "pause");
+        videoWrapper.addEventListener("mouseover", () => {
+          controlVideo(video, "play");
         });
-      }
+        videoWrapper.addEventListener("mouseout", () => {
+          controlVideo(video, "pause");
+        });
+      });
     }
   };
 
@@ -90,6 +111,25 @@
 
   // src/pages/careersList.ts
   var careersList = () => {
+  };
+
+  // src/utils/imagesLoaded.ts
+  var imagesLoaded = (toCheck, callback) => {
+    if (!toCheck)
+      toCheck = [...document.querySelectorAll("img")];
+    if (!Array.isArray(toCheck))
+      toCheck = [...toCheck];
+    const numberOfImages = toCheck.length;
+    let numberLoaded = 0;
+    toCheck.forEach((image) => {
+      const tempImage = new Image();
+      tempImage.src = image.src;
+      tempImage.onload = function() {
+        numberLoaded += 1;
+        if (numberLoaded === numberOfImages)
+          callback();
+      };
+    });
   };
 
   // src/utils/scrollAnimation.ts
@@ -110,27 +150,42 @@
     storyTextHighlight();
     processScroll();
     function heroScroll() {
-      const component = document.querySelector(".sticky_component");
       const hero = document.querySelector(".hero");
-      const track = hero.querySelector(".horizontal_track");
-      const move = track.querySelector(".horizontal_list");
-      const heroHeight = hero.offsetHeight;
-      const moveWidth = move.offsetWidth;
-      const windowWidth = window.innerWidth;
-      component.style.height = `${heroHeight + (moveWidth - windowWidth)}px`;
-      scrollAnimation({
-        timeline: {
-          trigger: component,
-          target: move,
-          start: `top top`,
-          end: `bottom bottom`
-        },
-        options: {
-          x: function() {
-            return (moveWidth - windowWidth) * -1;
+      if (!hero)
+        return;
+      const images = [...hero.querySelectorAll("img")];
+      if (images.length === 0)
+        return;
+      imagesLoaded(images, init);
+      function init() {
+        const component = document.querySelector(".sticky_component");
+        if (!component)
+          return;
+        const hero2 = component.querySelector(".hero");
+        if (!hero2)
+          return;
+        const track = hero2.querySelector(".horizontal_track");
+        if (!track)
+          return;
+        const move = track.querySelector(".horizontal_list");
+        if (!move)
+          return;
+        const heroHeight = hero2.offsetHeight;
+        const moveWidth = move.offsetWidth;
+        const windowWidth = window.innerWidth;
+        component.style.height = `${heroHeight + (moveWidth - windowWidth)}px`;
+        scrollAnimation({
+          timeline: {
+            trigger: component,
+            target: move,
+            start: `top top`,
+            end: `bottom bottom`
+          },
+          options: {
+            x: () => (moveWidth - windowWidth) * -1
           }
-        }
-      });
+        });
+      }
     }
     function storyTextHighlight() {
       const storyTexts = [...document.querySelectorAll(".story_text")];
@@ -144,38 +199,51 @@
             });
           },
           {
-            rootMargin: "0px 0px -45% 0px",
+            rootMargin: "0px 0px -20% 0px",
             threshold: 0.5
           }
         ).observe(trigger);
       });
     }
     function processScroll() {
-      const wrapper = document.querySelector(".process_wrapper");
-      const sticky = wrapper.querySelector(".process_sticky");
-      const track = sticky.querySelector(".process_track");
-      const move = track.querySelector(".horizontal_list");
-      const windowHeight = window.innerHeight;
-      const listHeight = move.offsetHeight;
-      const stickyTop = `${windowHeight / 2 - listHeight / 2}px`;
-      const stickyBottom = `${windowHeight / 2 + listHeight / 2}px`;
-      sticky.style.top = stickyTop;
-      const moveWidth = move.offsetWidth;
-      const windowWidth = window.innerWidth;
-      wrapper.style.height = `${moveWidth - windowWidth}px`;
-      scrollAnimation({
-        timeline: {
-          trigger: wrapper,
-          target: move,
-          start: `top ${stickyTop}`,
-          end: `bottom ${stickyBottom}`
-        },
-        options: {
-          x: function() {
-            return (moveWidth - windowWidth) * -1;
+      const target = document.querySelector(".section_how");
+      if (!target)
+        return;
+      const observer = new IntersectionObserver(init);
+      observer.observe(target);
+      function init() {
+        const wrapper = document.querySelector(".process_wrapper");
+        if (!wrapper)
+          return;
+        const sticky = wrapper.querySelector(".process_sticky");
+        if (!sticky)
+          return;
+        const track = sticky.querySelector(".process_track");
+        if (!track)
+          return;
+        const move = track.querySelector(".horizontal_list");
+        if (!move)
+          return;
+        const windowHeight = window.innerHeight;
+        const listHeight = move.offsetHeight;
+        const stickyTop = `${windowHeight / 2 - listHeight / 2}px`;
+        const stickyBottom = `${windowHeight / 2 + listHeight / 2}px`;
+        sticky.style.top = stickyTop;
+        const moveWidth = move.offsetWidth;
+        const windowWidth = window.innerWidth;
+        wrapper.style.height = `${moveWidth - windowWidth}px`;
+        scrollAnimation({
+          timeline: {
+            trigger: wrapper,
+            target: move,
+            start: `top ${stickyTop}`,
+            end: `bottom ${stickyBottom}`
+          },
+          options: {
+            x: () => (moveWidth - windowWidth) * -1
           }
-        }
-      });
+        });
+      }
     }
   };
 
@@ -183,9 +251,19 @@
   var home = () => {
     heroScroll();
     const breakpoint = getCurrentBreakpoint();
-    if (breakpoint === "main")
-      featuredWork();
-    services();
+    switch (breakpoint) {
+      case "main":
+        featuredWork();
+        services();
+        break;
+      case "medium":
+        services();
+        break;
+      case "small":
+        break;
+      case "tiny":
+        break;
+    }
     function heroScroll() {
       const track = document.querySelector(".home-hero_track");
       const target = track.querySelector(".home-hero_video");
@@ -216,8 +294,12 @@
           ...featuredWorkMetaList.querySelectorAll(".featured-meta_link")
         ];
         const featuredWorkItems = [...featuredWorkRow.querySelectorAll(".featured-work_item")];
-        featuredWorkItems.forEach((featuredWorkItem, index) => {
-          const featuredWorkMetaItem = featuredWorkMetaLinks[index];
+        featuredWorkItems.forEach((featuredWorkItem) => {
+          const featuredWorkLink = featuredWorkItem.querySelector("a");
+          const destination = featuredWorkLink.href;
+          const featuredWorkMetaItem = featuredWorkMetaLinks.find((link) => {
+            return link.href === destination;
+          });
           featuredWorkItem.addEventListener("mouseover", () => {
             const offset = featuredWorkMetaItem.offsetTop;
             featuredWorkMetaList.scrollTo({
