@@ -22,8 +22,11 @@ window.Webflow.push(() => {
     case '/careers':
       pages.careersList();
       break;
-    case pathname.includes('/work/'):
-      pages.workTemplate();
+    default:
+      if (pathname.includes('/work/')) {
+        console.log('woohoo');
+        pages.workTemplate();
+      }
       break;
   }
 });
