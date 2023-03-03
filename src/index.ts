@@ -23,10 +23,7 @@ window.Webflow.push(() => {
       pages.careersList();
       break;
     default:
-      if (pathname.includes('/work/')) {
-        console.log('woohoo');
-        pages.workTemplate();
-      }
+      if (pathname.includes('/work/')) pages.workTemplate();
       break;
   }
 });

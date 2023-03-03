@@ -55,6 +55,7 @@ export const culture = () => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               entry.target.classList.add('is-active');
+              observer.unobserve(entry.target);
             }
           });
         },
@@ -70,8 +71,17 @@ export const culture = () => {
     const target = document.querySelector('.section_how');
     if (!target) return;
 
-    const observer = new IntersectionObserver(init);
+    const observer = new IntersectionObserver(callback);
     observer.observe(target);
+
+    function callback(entries, observer) {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        init();
+        observer.unobserve(entry.target);
+      });
+    }
 
     function init() {
       const wrapper: HTMLElement | null = document.querySelector('.process_wrapper');
