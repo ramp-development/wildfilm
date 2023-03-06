@@ -69,5 +69,14 @@ export const all = () => {
         controlVideo(video, 'pause');
       });
     });
+
+    videoWrappers.forEach((videoWrapper) => {
+      const item = videoWrapper.querySelector('[data-video-timestamp]');
+      if (!item) return;
+
+      const timestamp = item.dataset.videoTimestamp;
+      const video = videoWrapper.querySelector('video');
+      video.currentTime = timestamp;
+    });
   }
 };
